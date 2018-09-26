@@ -114,14 +114,31 @@ zeroriscy_core #(.N_EXT_PERF_COUNTERS(N_EXT_PERF_COUNTERS), .RV32E(RV32E), .RV32
 
 initial clk_i = 1;
 always #1 clk_i = ~clk_i;
+  
+/*addi r5, r0, imm(1)*/  
+  logic[31:0] instruction1 = {12'b000000000011,5'b00000,3'b000,5'b00101,7'b0010011};
 
 initial begin
     $dumpfile("wave.vcd");
     $dumpvars(0, zeroriscy_tb);
 
-    rst_ni = 1; #1 rst_ni = 0;
-    
-    #10;
+    rst_ni = 0;
+  	fetch_enable_i = 1;
+  	instr_gnt_i = 0;
+  	instr_rvalid_i = 0;
+    #1;
+    rst_ni = 1;
+    #1;
+ 
+ 	// Fetch instruction protocol
+  	instr_rdata_i = instruction1;
+    instr_gnt_i =   1;
+    instr_rvalid_i = 1;
+  	#2;
+  	instr_gnt_i = 0;
+    instr_rvalid_i = 0;
+
+  
     $finish;
 end
 
